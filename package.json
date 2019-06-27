@@ -1,0 +1,17 @@
+{
+  "name": "webrtc-internals",
+  "version": "0.0.1",
+  "description": "WebRTC Internals",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vassjozsef/webrtc-internals"
+  },
+  "author": "Jozsef Vass",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
