@@ -12,7 +12,7 @@
     "graphs"
   ],
   "bugs": "https://github.com/vassjozsef/webrtc-internals/issues",
-  "homepage": "https://github.com/vassjozsef/webrtc-internal#readme",
+  "homepage": "https://github.com/vassjozsef/webrtc-internals#readme",
   "author": "Jozsef Vass",
   "license": "MIT"
 }
