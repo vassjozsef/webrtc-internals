@@ -138,3 +138,5 @@ var TimelineDataSeries = (function() {
 
   return TimelineDataSeries;
 })();
+
+module.exports = TimelineDataSeries;

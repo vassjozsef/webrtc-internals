@@ -514,3 +514,5 @@ function importModules(moduleNames) {
 function hasKeyModifiers(e) {
   return !!(e.altKey || e.ctrlKey || e.metaKey || e.shiftKey);
 }
+
+module.exports = $;

@@ -15,6 +15,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+const $ = require('./utils');
+
 /**
  * A TimelineGraphView displays a timeline graph on a canvas element.
  */
@@ -552,3 +554,5 @@ var TimelineGraphView = (function() {
 
   return TimelineGraphView;
 })();
+
+module.exports = TimelineGraphView;

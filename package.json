@@ -1,17 +1,18 @@
 {
   "name": "webrtc-internals",
   "version": "0.0.1",
-  "description": "WebRTC Internals",
+  "description": "WebRTC Internals Graphs",
+  "main": "src/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/vassjozsef/webrtc-internals"
   },
+  "keywords": [
+    "webrtc",
+    "graphs"
+  ],
+  "bugs": "https://github.com/vassjozsef/webrtc-internals/issues",
+  "homepage": "https://github.com/vassjozsef/webrtc-internal#readme",
   "author": "Jozsef Vass",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "express": "^4.17.1"
-  }
+  "license": "MIT"
 }
