@@ -23,3 +23,4 @@ Please see [https://github.com/vassjozsef/webrtc-internals-test](https://github.
 
     const timestamp = Date.now();
     dataSeries.addPoint(timestamp, Math.random());
+    graphView.updateEndDate();

@@ -50,6 +50,10 @@ var TimelineGraphView = (function() {
 
     this.canvas_ = canvas;
 
+    this.gridColor = GRID_COLOR;
+    this.textColor = TEXT_COLOR;
+    this.backgroundColor = BACKGROUND_COLOR;
+
     // Set the range and scale of the graph.  Times are in milliseconds since
     // the Unix epoch.
 
@@ -174,7 +178,7 @@ var TimelineGraphView = (function() {
       var context = this.canvas_.getContext('2d');
 
       // Clear the canvas.
-      context.fillStyle = BACKGROUND_COLOR;
+      context.fillStyle = this.backgroundColor;
       context.fillRect(0, 0, width, height);
 
       // Try to get font height in pixels.  Needed for layout.
@@ -210,7 +214,7 @@ var TimelineGraphView = (function() {
       this.drawTimeLabels(context, width, height, textHeight, visibleStartTime);
 
       // Draw outline of the main graph area.
-      context.strokeStyle = GRID_COLOR;
+      context.strokeStyle = this.gridColor;
       context.strokeRect(0, 0, width - 1, height - 1);
 
       if (this.graph_) {
@@ -243,8 +247,8 @@ var TimelineGraphView = (function() {
 
       context.textBaseline = 'bottom';
       context.textAlign = 'center';
-      context.fillStyle = TEXT_COLOR;
-      context.strokeStyle = GRID_COLOR;
+      context.fillStyle = this.textColor;
+      context.strokeStyle = this.gridColor;
 
       // Draw labels and vertical grid lines.
       while (true) {
@@ -480,7 +484,7 @@ var TimelineGraphView = (function() {
         x1 = this.width_ - 1;
         x2 = this.width_ - 1 - Y_AXIS_TICK_LENGTH;
 
-        context.fillStyle = GRID_COLOR;
+        context.fillStyle = this.gridColor;
         context.beginPath();
         for (var i = 1; i < this.labels_.length - 1; ++i) {
           // The rounding is needed to avoid ugly 2-pixel wide anti-aliased
@@ -530,7 +534,7 @@ var TimelineGraphView = (function() {
         var x = this.width_ - LABEL_HORIZONTAL_SPACING;
 
         // Set up the context.
-        context.fillStyle = TEXT_COLOR;
+        context.fillStyle = this.textColor;
         context.textAlign = 'right';
 
         // Draw top label, which is the only one that appears below its tick
