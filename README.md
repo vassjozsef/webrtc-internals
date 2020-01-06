@@ -11,10 +11,12 @@ Install
 
 Use
 ---
+Please see [https://github.com/vassjozsef/webrtc-internals-test](https://github.com/vassjozsef/webrtc-internals-test):
 
     const {TimelineDataSeries, TimelineGraphView} = require('webrtc-internals');
-  
-    const graphView = new TimelineGraphView('graph-div', 'graph-canvas');
+ 
+    const canvas = document.getElementById('canvas')
+    const graphView = new TimelineGraphView(canvas);
 
     const dataSeries = new TimelineDataSeries();
     graphView.addDataSeries(dataSeries);
