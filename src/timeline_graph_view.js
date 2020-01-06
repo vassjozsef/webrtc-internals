@@ -15,8 +15,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-const $ = require('./utils');
-
 /**
  * A TimelineGraphView displays a timeline graph on a canvas element.
  */
@@ -47,11 +45,10 @@ var TimelineGraphView = (function() {
   /**
    * @constructor
    */
-  function TimelineGraphView(divId, canvasId) {
+  function TimelineGraphView(canvas) {
     this.scrollbar_ = {position_: 0, range_: 0};
 
-    this.graphDiv_ = $(divId);
-    this.canvas_ = $(canvasId);
+    this.canvas_ = canvas;
 
     // Set the range and scale of the graph.  Times are in milliseconds since
     // the Unix epoch.
