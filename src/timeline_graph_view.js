@@ -54,6 +54,9 @@ var TimelineGraphView = (function() {
     this.textColor = TEXT_COLOR;
     this.backgroundColor = BACKGROUND_COLOR;
 
+    this.timeLocales = [];
+    this.timeOptions = {};
+
     // Set the range and scale of the graph.  Times are in milliseconds since
     // the Unix epoch.
 
@@ -255,7 +258,7 @@ var TimelineGraphView = (function() {
         var x = Math.round((time - startTime) / this.scale_);
         if (x >= width)
           break;
-        var text = (new Date(time)).toLocaleTimeString();
+        var text = (new Date(time)).toLocaleTimeString(this.timeLocales, this.timeOptions);
         context.fillText(text, x, textHeight);
         context.beginPath();
         context.lineTo(x, 0);
