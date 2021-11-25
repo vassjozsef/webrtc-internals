@@ -21,6 +21,9 @@
 var TimelineGraphView = (function() {
   'use strict';
 
+  // Hardcoded font size for the graph labels
+  var FONT_SIZE = 10;
+
   // Maximum number of labels placed vertically along the sides of the graph.
   var MAX_VERTICAL_LABELS = 6;
 
@@ -45,10 +48,13 @@ var TimelineGraphView = (function() {
   /**
    * @constructor
    */
-  function TimelineGraphView(canvas) {
+  function TimelineGraphView(canvas, devicePixelRatio) {
     this.scrollbar_ = {position_: 0, range_: 0};
 
+    this.devicePixelRatio = devicePixelRatio || 1;
     this.canvas_ = canvas;
+    canvas.width = parseInt(canvas.width, 10) * this.devicePixelRatio;
+    canvas.height = parseInt(canvas.height, 10) * this.devicePixelRatio;
 
     this.gridColor = GRID_COLOR;
     this.textColor = TEXT_COLOR;
@@ -151,7 +157,7 @@ var TimelineGraphView = (function() {
      */
     setDataSeries: function(dataSeries) {
       // Simply recreates the Graph.
-      this.graph_ = new Graph();
+      this.graph_ = new Graph(this.devicePixelRatio);
       for (var i = 0; i < dataSeries.length; ++i)
         this.graph_.addDataSeries(dataSeries[i]);
       this.repaint();
@@ -162,7 +168,7 @@ var TimelineGraphView = (function() {
     */
     addDataSeries: function(dataSeries) {
       if (!this.graph_)
-        this.graph_ = new Graph();
+        this.graph_ = new Graph(this.devicePixelRatio);
       this.graph_.addDataSeries(dataSeries);
       this.repaint();
     },
@@ -176,21 +182,16 @@ var TimelineGraphView = (function() {
       }
       this.repaintTimerRunning_ = false;
 
-      var width = this.canvas_.width;
-      var height = this.canvas_.height;
+      var width = this.canvas_.width / this.devicePixelRatio;
+      var height = this.canvas_.height / this.devicePixelRatio;
       var context = this.canvas_.getContext('2d');
 
       // Clear the canvas.
       context.fillStyle = this.backgroundColor;
-      context.fillRect(0, 0, width, height);
-
-      // Try to get font height in pixels.  Needed for layout.
-      var fontHeightString = context.font.match(/([0-9]+)px/)[1];
-      var fontHeight = parseInt(fontHeightString);
+      context.fillRect(0, 0, width * this.devicePixelRatio, height * this.devicePixelRatio);
 
       // Safety check, to avoid drawing anything too ugly.
-      if (fontHeightString.length == 0 || fontHeight <= 0 ||
-          fontHeight * 4 > height || width < 50) {
+      if (FONT_SIZE * 4 > height || width < 50) {
         return;
       }
 
@@ -207,23 +208,24 @@ var TimelineGraphView = (function() {
       // If the entire time range is being displayed, align the right edge of
       // the graph to the end of the time range.
       if (this.scrollbar_.range_ == 0)
-        position = this.getLength_() - this.canvas_.width;
+        position = this.getLength_() - width;
       var visibleStartTime = this.startTime_ + position * this.scale_;
 
       // Make space at the bottom of the graph for the time labels, and then
       // draw the labels.
       var textHeight = height;
-      height -= fontHeight + LABEL_VERTICAL_SPACING;
+      height -= FONT_SIZE + LABEL_VERTICAL_SPACING;
       this.drawTimeLabels(context, width, height, textHeight, visibleStartTime);
 
       // Draw outline of the main graph area.
       context.strokeStyle = this.gridColor;
-      context.strokeRect(0, 0, width - 1, height - 1);
+      context.strokeWidth = this.devicePixelRatio;
+      context.strokeRect(0, 0, (width - 1) * this.devicePixelRatio, (height - 1) * this.devicePixelRatio);
 
       if (this.graph_) {
         // Layout graph and have them draw their tick marks.
         this.graph_.layout(
-            width, height, fontHeight, visibleStartTime, this.scale_);
+            width, height, FONT_SIZE, visibleStartTime, this.scale_);
         this.graph_.drawTicks(context);
 
         // Draw the lines of all graphs, and then draw their labels.
@@ -252,6 +254,8 @@ var TimelineGraphView = (function() {
       context.textAlign = 'center';
       context.fillStyle = this.textColor;
       context.strokeStyle = this.gridColor;
+      context.lineWidth = this.devicePixelRatio;
+      context.font = context.font.replace(/\d+px/, `${FONT_SIZE * this.devicePixelRatio}px`);
 
       // Draw labels and vertical grid lines.
       while (true) {
@@ -259,10 +263,10 @@ var TimelineGraphView = (function() {
         if (x >= width)
           break;
         var text = (new Date(time)).toLocaleTimeString(this.timeLocales, this.timeOptions);
-        context.fillText(text, x, textHeight);
+        context.fillText(text, x * this.devicePixelRatio, textHeight * this.devicePixelRatio);
         context.beginPath();
-        context.lineTo(x, 0);
-        context.lineTo(x, height);
+        context.lineTo(x * this.devicePixelRatio, 0);
+        context.lineTo(x * this.devicePixelRatio, height * devicePixelRatio);
         context.stroke();
         time += timeStep;
       }
@@ -291,7 +295,8 @@ var TimelineGraphView = (function() {
     /**
      * @constructor
      */
-    function Graph() {
+    function Graph(devicePixelRatio) {
+      this.devicePixelRatio = devicePixelRatio || 1;
       this.dataSeries_ = [];
 
       // Cached properties of the graph, set in layout.
@@ -488,13 +493,14 @@ var TimelineGraphView = (function() {
         x2 = this.width_ - 1 - Y_AXIS_TICK_LENGTH;
 
         context.fillStyle = this.gridColor;
+        context.lineWidth = this.devicePixelRatio;
         context.beginPath();
         for (var i = 1; i < this.labels_.length - 1; ++i) {
           // The rounding is needed to avoid ugly 2-pixel wide anti-aliased
           // lines.
           var y = Math.round(this.height_ * i / (this.labels_.length - 1));
-          context.moveTo(x1, y);
-          context.lineTo(x2, y);
+          context.moveTo(x1 * this.devicePixelRatio, y * this.devicePixelRatio);
+          context.lineTo(x2 * this.devicePixelRatio, y * this.devicePixelRatio);
         }
         context.stroke();
       },
@@ -517,12 +523,15 @@ var TimelineGraphView = (function() {
           if (!values)
             continue;
           context.strokeStyle = this.dataSeries_[i].getColor();
+          context.lineWidth = this.devicePixelRatio;
           context.beginPath();
           for (var x = 0; x < values.length; ++x) {
             // The rounding is needed to avoid ugly 2-pixel wide anti-aliased
             // horizontal lines.
             context.lineTo(
-                x, bottom - Math.round((values[x] - this.min_) * scale));
+              x * this.devicePixelRatio,
+              (bottom - Math.round((values[x] - this.min_) * scale)) * this.devicePixelRatio
+            );
           }
           context.stroke();
         }
@@ -549,7 +558,10 @@ var TimelineGraphView = (function() {
         context.textBaseline = 'bottom';
         var step = (this.height_ - 1) / (this.labels_.length - 1);
         for (var i = 1; i < this.labels_.length; ++i)
-          context.fillText(this.labels_[i], x, step * i);
+          context.fillText(
+            this.labels_[i],
+            x * this.devicePixelRatio, step * i * this.devicePixelRatio
+          );
       }
     };
 
