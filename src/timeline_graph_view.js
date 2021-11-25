@@ -198,11 +198,6 @@ var TimelineGraphView = (function() {
       // Save current transformation matrix so we can restore it later.
       context.save();
 
-      // The center of an HTML canvas pixel is technically at (0.5, 0.5).  This
-      // makes near straight lines look bad, due to anti-aliasing.  This
-      // translation reduces the problem a little.
-      context.translate(0.5, 0.5);
-
       // Figure out what time values to display.
       var position = this.scrollbar_.position_;
       // If the entire time range is being displayed, align the right edge of
@@ -219,8 +214,13 @@ var TimelineGraphView = (function() {
 
       // Draw outline of the main graph area.
       context.strokeStyle = this.gridColor;
-      context.strokeWidth = this.devicePixelRatio;
-      context.strokeRect(0, 0, (width - 1) * this.devicePixelRatio, (height - 1) * this.devicePixelRatio);
+      context.lineWidth = this.devicePixelRatio;
+      context.strokeRect(
+        Math.floor(this.devicePixelRatio / 2),
+        Math.floor(this.devicePixelRatio / 2),
+        (width - 1) * this.devicePixelRatio,
+        (height - 1) * this.devicePixelRatio
+      );
 
       if (this.graph_) {
         // Layout graph and have them draw their tick marks.
@@ -265,8 +265,14 @@ var TimelineGraphView = (function() {
         var text = (new Date(time)).toLocaleTimeString(this.timeLocales, this.timeOptions);
         context.fillText(text, x * this.devicePixelRatio, textHeight * this.devicePixelRatio);
         context.beginPath();
-        context.lineTo(x * this.devicePixelRatio, 0);
-        context.lineTo(x * this.devicePixelRatio, height * devicePixelRatio);
+        context.lineTo(
+          x * this.devicePixelRatio,
+          1 + Math.floor(this.devicePixelRatio / 2)
+        );
+        context.lineTo(
+          x * this.devicePixelRatio,
+          height * this.devicePixelRatio - 1 - Math.floor(this.devicePixelRatio / 2)
+        );
         context.stroke();
         time += timeStep;
       }
@@ -530,7 +536,7 @@ var TimelineGraphView = (function() {
             // horizontal lines.
             context.lineTo(
               x * this.devicePixelRatio,
-              (bottom - Math.round((values[x] - this.min_) * scale)) * this.devicePixelRatio
+              (bottom - Math.round((values[x] - this.min_) * scale)) * this.devicePixelRatio + Math.floor(this.devicePixelRatio / 2)
             );
           }
           context.stroke();
@@ -552,7 +558,7 @@ var TimelineGraphView = (function() {
         // Draw top label, which is the only one that appears below its tick
         // mark.
         context.textBaseline = 'top';
-        context.fillText(this.labels_[0], x, 0);
+        context.fillText(this.labels_[0], x * this.devicePixelRatio, 0);
 
         // Draw all the other labels.
         context.textBaseline = 'bottom';
@@ -560,7 +566,8 @@ var TimelineGraphView = (function() {
         for (var i = 1; i < this.labels_.length; ++i)
           context.fillText(
             this.labels_[i],
-            x * this.devicePixelRatio, step * i * this.devicePixelRatio
+            x * this.devicePixelRatio,
+            step * i * this.devicePixelRatio
           );
       }
     };
