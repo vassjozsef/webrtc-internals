@@ -65,6 +65,17 @@ var TimelineDataSeries = (function() {
         this.dataPoints_.shift();
     },
 
+    /**
+     * Sets series to array of DataPoint time-values. 
+     * DataPoints are assumed to be received in chronological order.
+     */
+    setPoints: function(points) {
+      this.dataPoints_ = [...points];
+
+      while (this.dataPoints_.length > MAX_STATS_DATA_POINT_BUFFER_SIZE)
+        this.dataPoints_.shift();
+    },
+
     isVisible: function() {
       return this.isVisible_;
     },

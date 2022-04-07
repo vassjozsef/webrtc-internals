@@ -1,6 +1,6 @@
 {
   "name": "webrtc-internals",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "WebRTC Internals Graphs",
   "main": "src/index.js",
   "repository": {
