@@ -65,6 +65,16 @@ var TimelineDataSeries = (function() {
         this.dataPoints_.shift();
     },
 
+    /**
+     * Sets series to array of DataPoint time-values. DataPoints are
+     * assumed to be received in chronological order. Truncates older
+     * values over maximum length. 
+     */
+    setPoints: function(points) {
+      const startIndex = Math.max(0, points.length - MAX_STATS_DATA_POINT_BUFFER_SIZE);
+      this.dataPoints_ = points.slice(startIndex);
+    },
+
     isVisible: function() {
       return this.isVisible_;
     },
