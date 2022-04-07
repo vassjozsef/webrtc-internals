@@ -70,10 +70,7 @@ var TimelineDataSeries = (function() {
      * DataPoints are assumed to be received in chronological order.
      */
     setPoints: function(points) {
-      this.dataPoints_ = [...points];
-
-      while (this.dataPoints_.length > MAX_STATS_DATA_POINT_BUFFER_SIZE)
-        this.dataPoints_.shift();
+      this.dataPoints_ = points.slice(0, Math.min(points.length, MAX_STATS_DATA_POINT_BUFFER_SIZE));
     },
 
     isVisible: function() {
