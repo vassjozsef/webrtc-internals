@@ -72,7 +72,7 @@ var TimelineDataSeries = (function() {
      */
     setPoints: function(points) {
       const startIndex = Math.max(0, points.length - MAX_STATS_DATA_POINT_BUFFER_SIZE);
-      this.dataPoints_ = points.slice(startIndex, points.length);
+      this.dataPoints_ = points.slice(startIndex);
     },
 
     isVisible: function() {
