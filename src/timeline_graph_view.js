@@ -74,7 +74,7 @@ var TimelineGraphView = (function() {
     this.graph_ = null;
 
     // Horizontal scale factor, in terms of milliseconds per pixel.
-    this.scale_ = 1000;
+    this.scale_ = 1000 / this.devicePixelRatio;
 
     // Initialize the scrollbar.
     this.updateScrollbarRange_(true);
@@ -182,14 +182,14 @@ var TimelineGraphView = (function() {
       }
       this.repaintTimerRunning_ = false;
 
-      var width = this.canvas_.width / this.devicePixelRatio;
-      var height = this.canvas_.height / this.devicePixelRatio;
+      var width = this.canvas_.width;
+      var height = this.canvas_.height;
       var context = this.canvas_.getContext('2d');
 
       // Clear the canvas.
       context.fillStyle = this.backgroundColor;
-      context.fillRect(0, 0, width * this.devicePixelRatio, height * this.devicePixelRatio);
-
+      context.fillRect(0, 0, width, height);
+      
       // Safety check, to avoid drawing anything too ugly.
       if (FONT_SIZE * 4 > height || width < 50) {
         return;
@@ -208,18 +208,18 @@ var TimelineGraphView = (function() {
 
       // Make space at the bottom of the graph for the time labels, and then
       // draw the labels.
-      var textHeight = height;
-      height -= FONT_SIZE + LABEL_VERTICAL_SPACING;
-      this.drawTimeLabels(context, width, height, textHeight, visibleStartTime);
+      var textY = height;
+      height -= Math.ceil(FONT_SIZE * this.devicePixelRatio) + LABEL_VERTICAL_SPACING;
+      this.drawTimeLabels(context, width, height, textY, visibleStartTime);
 
       // Draw outline of the main graph area.
       context.strokeStyle = this.gridColor;
       context.lineWidth = this.devicePixelRatio;
       context.strokeRect(
-        Math.floor(this.devicePixelRatio / 2),
-        Math.floor(this.devicePixelRatio / 2),
-        (width - 1) * this.devicePixelRatio,
-        (height - 1) * this.devicePixelRatio
+        1,
+        1,
+        (width - 1),
+        (height - 1)
       );
 
       if (this.graph_) {
@@ -242,7 +242,7 @@ var TimelineGraphView = (function() {
      * since it may not be |startTime_|, when we're displaying the entire
      * time range.
      */
-    drawTimeLabels: function(context, width, height, textHeight, startTime) {
+    drawTimeLabels: function(context, width, height, textY, startTime) {
       // Draw the labels 1 minute apart.
       var timeStep = 1000 * 60;
 
@@ -263,15 +263,15 @@ var TimelineGraphView = (function() {
         if (x >= width)
           break;
         var text = (new Date(time)).toLocaleTimeString(this.timeLocales, this.timeOptions);
-        context.fillText(text, x * this.devicePixelRatio, textHeight * this.devicePixelRatio);
+        context.fillText(text, x, textY);
         context.beginPath();
         context.lineTo(
-          x * this.devicePixelRatio,
-          1 + Math.floor(this.devicePixelRatio / 2)
+          x,
+          1
         );
         context.lineTo(
-          x * this.devicePixelRatio,
-          height * this.devicePixelRatio - 1 - Math.floor(this.devicePixelRatio / 2)
+          x,
+          height
         );
         context.stroke();
         time += timeStep;
@@ -505,8 +505,8 @@ var TimelineGraphView = (function() {
           // The rounding is needed to avoid ugly 2-pixel wide anti-aliased
           // lines.
           var y = Math.round(this.height_ * i / (this.labels_.length - 1));
-          context.moveTo(x1 * this.devicePixelRatio, y * this.devicePixelRatio);
-          context.lineTo(x2 * this.devicePixelRatio, y * this.devicePixelRatio);
+          context.moveTo(x1, y);
+          context.lineTo(x2, y);
         }
         context.stroke();
       },
@@ -535,8 +535,8 @@ var TimelineGraphView = (function() {
             // The rounding is needed to avoid ugly 2-pixel wide anti-aliased
             // horizontal lines.
             context.lineTo(
-              x * this.devicePixelRatio,
-              (bottom - Math.round((values[x] - this.min_) * scale)) * this.devicePixelRatio + Math.floor(this.devicePixelRatio / 2)
+              x,
+              (bottom - Math.round((values[x] - this.min_) * scale))
             );
           }
           context.stroke();
@@ -558,7 +558,7 @@ var TimelineGraphView = (function() {
         // Draw top label, which is the only one that appears below its tick
         // mark.
         context.textBaseline = 'top';
-        context.fillText(this.labels_[0], x * this.devicePixelRatio, 0);
+        context.fillText(this.labels_[0], x, 0);
 
         // Draw all the other labels.
         context.textBaseline = 'bottom';
@@ -566,8 +566,8 @@ var TimelineGraphView = (function() {
         for (var i = 1; i < this.labels_.length; ++i)
           context.fillText(
             this.labels_[i],
-            x * this.devicePixelRatio,
-            step * i * this.devicePixelRatio
+            x,
+            step * i
           );
       }
     };
